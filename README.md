@@ -65,3 +65,7 @@ python swarm_simulation.py "path/to/cs" "0,0" "50,50" --droneInit "40,40"
 - **Number of boids** 5
 
 - **Visual range** 20
+
+## Visual example
+
+![Version1 img](img/version1.png?raw=true "Title")
