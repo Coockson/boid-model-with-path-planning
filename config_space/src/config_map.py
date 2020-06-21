@@ -23,10 +23,12 @@ from shapely.geometry import MultiPoint, MultiPolygon
 log = True
 
 # -- methods -- 
-def create_config_space(formation,obstacles, boundary):
+def create_config_space(form,obs, boundary):
     if log:
         print("Started creating configuration space")
     # ---- Get config space boundary ----
+    formation = f(form)
+    obstacles = point2shape(obs)
     u = Polygon([(0.1,0.1),(0.1,boundary[1]-1.1),(boundary[0]-1.1,boundary[1]-1.1),(boundary[0]-1.1,0.1)])
     #Create empty config space
     cs = np.zeros([boundary[0],boundary[1]])
