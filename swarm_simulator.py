@@ -8,9 +8,10 @@ import argparse
 TK_SILENCE_DEPRECATION=1
 parser = argparse.ArgumentParser()
 
-parser.add_argument("cs", help="Path to the configuration space", type=str)
+parser.add_argument("--cs", help="Path to the configuration space", type=str)
 parser.add_argument("start", help="Start point. \"x,y\" , e.g \"10,10\" ", type=str)
 parser.add_argument("goal", help="Goal point. \"x,y\" , e.g \"10,10\" ", type=str)
+parser.add_argument("--numDrones", help="Number of drones. Default 5 ", type=int)
 parser.add_argument("--path", help="The path planning algorithm. E.g \"a*\" or \"rrt*\"  ", type=str)
 parser.add_argument("--droneInit", help="Drone start location. \"x,y\" , Default \"0,0\" ", type=str)
 parser.add_argument("--droneSpread", help="Drone spread around initial point. Default 5 ", type=int)
@@ -18,8 +19,8 @@ parser.add_argument("--aStarReso", help="A* algorithm resolution. Default 5 ", t
 
 
 args = parser.parse_args()
-
-cs = np.load(args.cs)
+if args.cs:
+    cs = np.load(args.cs)
 start = [int(x) for x in (str(args.start)).split(",")]
 goal = [int(x) for x in (str(args.goal)).split(",")]
 selection = 1
@@ -42,6 +43,10 @@ if args.droneSpread:
 if args.aStarReso:
     areso = args.aStarReso
 
+numDrones = 5
+if args.numDrones:
+    numDrones = args.numDrones
+
 #temp data
 cs = np.zeros([500,500])
 cs[1][1] = 1
@@ -50,11 +55,11 @@ cs[0][499] = 1
 cs[499][499] = 1
 cs[250:300,0:230] = 1
 cs[250:300,270:500] = 1
-#path = [(200,250),(420,250),(500,10)]
+path = [(200,250),(420,250),(500,10)]
 
 
 #=======================================================================
-if selection == 1:
+if selection == 1 and args.path:
     print("Started A* path planning")
     ox = []
     oy = []
@@ -69,7 +74,7 @@ if selection == 1:
     path = list(zip(pathx,pathy))
     path.reverse()
     print("Path planning done")
-if selection == 2:
+if selection == 2 and args.path:
     print("Started RRT* path planning")
     newcs = []
     for row in range(0,cs.shape[0]):
@@ -89,5 +94,5 @@ if selection == 2:
 
 
 
-a = BoidModel(0.12, 0.30,  0.05, 0.05,   0.08,  50,  4, 3, 5, 20,  cs,path,init,spread)
+a = BoidModel(0.12, 0.30,  0.05, 0.05,   0.08,  50,  4, 4, numDrones, 20,  cs,path,init,spread)
 a.runBoid()

@@ -47,20 +47,6 @@ class BoidModel():
         self.show = True
         self.calcCol = True
 
-    """numBoids =8
-    visualRange = 50  #75  # possible idea: change visual range to formation shape 
-
-    centeringFactor = 0.02 #0.005  #Coherence Each boid flies towards the the other boids.
-    avoidFactor = 0.8 #0.15 # Adjust velocity by this  If it gets too close to another boid it will steer away from it
-    avoidFactorObs = 0.2
-    motivation = 0.08
-    goalDist = 20
-    minDistance = 4
-    speedLimit = 10"""
-
-    """boids = []
-    dummy_boids = []"""
-
 
     class Boid():
         def __init__(self, ID, x, y):
@@ -112,13 +98,6 @@ class BoidModel():
         centerX = 0
         centerY = 0
         numNeighbors = 0
-
-#        if boid.ID in self.broken:
-#            for otherBoid in self.boids:
-#                if (self.distance(boid, otherBoid) < 1):
-#                    centerX += otherBoid.x
-#                    centerY += otherBoid.y
-#                    numNeighbors += 1
         
         for otherBoid in self.boids:
             if (self.distance(boid, otherBoid) < self.visualRange):
@@ -135,10 +114,8 @@ class BoidModel():
         
     def avoidOthers(self,boid):
 
-        
         moveX = 0
         moveY = 0
-
 
         for otherBoid in self.boids:
             if (otherBoid != boid):
@@ -199,12 +176,7 @@ class BoidModel():
 
         boid.dx += moveX * self.avoidFactorObs
         boid.dy += moveY * self.avoidFactorObs
-    """
-    def towardsGoal(boid):
-        self.goal
-        self.motivation
-        boid.dx += (goal[0] - boid.x) * motivation
-        boid.dy += (goal[1] - boid.x) * motivation"""
+
 
     def followPath(self,boid, path,count):
         current = boid.waypoint
@@ -287,6 +259,12 @@ class BoidModel():
         vr = Entry(control,width=8, textvariable= v)
         vr.grid(row=1,column=7,sticky=W,padx=10)
         
+        speedlbl = Label(control,text="Speed limit",padx=10)
+        speedlbl.grid(row=0,column=8,sticky=W)
+        v = StringVar(control, value=str(self.speedLimit))
+        speed = Entry(control,width=8, textvariable= v)
+        speed.grid(row=1,column=8,sticky=W,padx=10)
+        
         numlbl = Label(control,text="Collisions:",padx=10)
         numlbl.grid(row=2,column=5,sticky=W)
         strlbl = StringVar()
@@ -310,10 +288,12 @@ class BoidModel():
                 self.matchingFactor = float(ali.get())
             if not (len(goal.get()) == 0):    
                 self.motivation = float(goal.get())
+            if not (len(speed.get()) == 0):    
+                self.speedLimit = float(speed.get())
             
 
         def startClick():
-            self.pause = not self.pause
+            self.done = not self.done
 
         def restart_program():
             """Restarts the current program.
@@ -329,7 +309,7 @@ class BoidModel():
         getButton = ttk.Button(control, text = "Apply",command= getClick)
         getButton.grid(row=2,column=1,sticky=W)
 
-        startButton = ttk.Button(control, text = "Stop",command= startClick)
+        startButton = ttk.Button(control, text = "Pause",command= startClick)
         startButton.grid(row=2,column=2,sticky=W)
 
         resButton = ttk.Button(control, text = "Restart",command= restart_program)
@@ -379,8 +359,10 @@ class BoidModel():
                 count += 1
         
         iteration = 0
-        while self.done == False: #and iteration < 1500:
-            if not self.pause:
+        bos = 0
+        while True:
+            while self.done == False: #and iteration < 1500:
+
                 count = 0
                 for boid in self.boids[0:self.numBoids]:
                     # Update the velocities according to each rule
@@ -419,7 +401,8 @@ class BoidModel():
                                             self.col_drone = self.col_drone +1
                                             #updateCollision()
                                             print("Collision!")
-                                            strlbl.set(str(self.col_drone/2+self.col_obs))
+                                            #strlbl.set(str(self.col_drone/2+self.col_obs))
+                                            colLabel.config(text=str(self.col_drone/2+self.col_obs))
                             for boid in self.boids:
                                 for obs in self.dummy_boids:
                                     if ( boid.waypoint < len(self.path) and other.waypoint < len(self.path)-1 
@@ -428,15 +411,16 @@ class BoidModel():
                                             self.col_obs = self.col_obs +1
                                             #updateCollision()
                                             print("Collision!")
-                                            strlbl.set(str(self.col_drone/2+self.col_obs))
-                            
+                                            #strlbl.set(str(self.col_drone/2+self.col_obs))
+                                            colLabel.config(text=str(self.col_drone/2+self.col_obs))
+                        
                     
                     if self.show:
                         self.master.update_idletasks()
                         self.master.update()
-                else:
-                    time.sleep(0.2)
-                    pass
+
+            self.master.update_idletasks()
+            self.master.update()
         self.master.mainloop()
             
             
