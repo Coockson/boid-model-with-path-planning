@@ -13,7 +13,7 @@ debug = False
 
 class BoidModel():
 
-    def __init__(self,centeringFactor,avoidFactor,matchingFactor ,avoidFactorObs,motivation,goalDist,minDistance,speedLimit,numBoids, visualRange, cs, path,init,spread):
+    def __init__(self,centeringFactor,avoidFactor,matchingFactor ,avoidFactorObs,motivation,goalDist,minDistance,speedLimit,numBoids, visualRange, cs, path,init,spread,tail):
         self.centeringFactor =centeringFactor 
         self.avoidFactor= avoidFactor 
         self.avoidFactorObs = avoidFactorObs 
@@ -28,6 +28,7 @@ class BoidModel():
         self.matchingFactor = matchingFactor
         self.init = init
         self.spread = spread
+        self.tail = tail
 
         self.width = cs.shape[0]
         self.height = cs.shape[1]
@@ -92,7 +93,7 @@ class BoidModel():
         if (boid.y > self.height - margin):
             boid.dy -= turnFactor
 
-    def flyTowardsCenter(self,boid):
+    def flyTowardsCenter(self,boid): # Coherence ---------------------------
 
 
         centerX = 0
@@ -112,7 +113,7 @@ class BoidModel():
             boid.dx += (centerX - boid.x) * self.centeringFactor
             boid.dy += (centerY - boid.y) * self.centeringFactor
         
-    def avoidOthers(self,boid):
+    def avoidOthers(self,boid): # Separation ---------------------------
 
         moveX = 0
         moveY = 0
@@ -126,7 +127,7 @@ class BoidModel():
         boid.dx += moveX * self.avoidFactor
         boid.dy += moveY * self.avoidFactor
 
-    def matchVelocity(self,boid):
+    def matchVelocity(self,boid): #Alignment ---------------------------
 
 
         avgDX = 0
@@ -161,7 +162,7 @@ class BoidModel():
                 if self.cs[xi][yi] == 1:
                     self.dummy_boids.append(BoidModel.Boid(-1,xi,yi))
 
-    def avoidObsticles(self,boid):
+    def avoidObsticles(self,boid): # Obstacle avoidance ---------------------------
         self.dummy_boids
         self.avoidFactorObs
         minDistance = 12 # The distance to stay away from other boids
@@ -178,7 +179,7 @@ class BoidModel():
         boid.dy += moveY * self.avoidFactorObs
 
 
-    def followPath(self,boid, path,count):
+    def followPath(self,boid, path,count): # Follow goal ---------------------------
         current = boid.waypoint
 
 
@@ -381,7 +382,8 @@ class BoidModel():
                     boid.y += boid.dy
                     
                     if self.show:
-                        canvas.create_line(boid.history[-1][0], boid.history[-1][1],boid.x, boid.y)
+                        if self.tail == 1:
+                            canvas.create_line(boid.history[-1][0], boid.history[-1][1],boid.x, boid.y)
                         boid.history.append([boid.x, boid.y])
                         #boid.history = boid.history.slice(-50)
                     

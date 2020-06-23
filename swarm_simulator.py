@@ -5,13 +5,17 @@ from tkinter import *
 from tkinter import ttk
 import numpy as np
 import argparse
-TK_SILENCE_DEPRECATION=1
+
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--cs", help="Path to the configuration space", type=str)
-parser.add_argument("start", help="Start point. \"x,y\" , e.g \"10,10\" ", type=str)
-parser.add_argument("goal", help="Goal point. \"x,y\" , e.g \"10,10\" ", type=str)
+parser.add_argument("--start", help="Start point. \"x,y\" , e.g \"10,10\" ", type=str)
+parser.add_argument("--goal", help="Goal point. \"x,y\" , e.g \"10,10\" ", type=str)
 parser.add_argument("--numDrones", help="Number of drones. Default 5 ", type=int)
+parser.add_argument("--expath", help="example paths ", type=int)
+parser.add_argument("--exmap", help="example maps ", type=int)
+parser.add_argument("--tail", help="Drone trail. 1 enabled, 2 disabled ", type=int)
 parser.add_argument("--path", help="The path planning algorithm. E.g \"a*\" or \"rrt*\"  ", type=str)
 parser.add_argument("--droneInit", help="Drone start location. \"x,y\" , Default \"0,0\" ", type=str)
 parser.add_argument("--droneSpread", help="Drone spread around initial point. Default 5 ", type=int)
@@ -21,12 +25,20 @@ parser.add_argument("--aStarReso", help="A* algorithm resolution. Default 5 ", t
 args = parser.parse_args()
 if args.cs:
     cs = np.load(args.cs)
-start = [int(x) for x in (str(args.start)).split(",")]
-goal = [int(x) for x in (str(args.goal)).split(",")]
+
+if args.start:
+    start = [int(x) for x in (str(args.start)).split(",")]
+
+if args.goal:
+    goal = [int(x) for x in (str(args.goal)).split(",")]
 selection = 1
 init = [0,0]
 spread = 5
 areso = 5
+
+tail = 1
+if args.tail:
+    tail = args.tail
 
 if args.path:
     if args.path == "a*":
@@ -47,15 +59,38 @@ numDrones = 5
 if args.numDrones:
     numDrones = args.numDrones
 
-#temp data
-cs = np.zeros([500,500])
-cs[1][1] = 1
-cs[499][0] = 1
-cs[0][499] = 1
-cs[499][499] = 1
-cs[250:300,0:230] = 1
-cs[250:300,270:500] = 1
-path = [(200,250),(420,250),(500,10)]
+exmap = 1
+if args.exmap:
+    exmap = args.exmap
+
+expath = 1
+if args.expath:
+    expath = args.expath
+
+if exmap == 1:
+    cs = np.zeros([500,500])
+    cs[50:150,50:150] = 1
+    cs[300:400,300:400] = 1
+    cs[200:250,100:300] = 1
+
+if expath == 1:
+    path = [(20,100),(40,200),(160,200),(180,130),(220,70),(270,130), (270,250)]
+
+if expath == 2:
+    path = [(20,100),(160,200),(270,130)]
+
+if exmap == 2:
+    cs = np.zeros([500,500])
+    cs[1][1] = 1
+    cs[499][0] = 1
+    cs[0][499] = 1
+    cs[499][499] = 1
+    cs[250:300,0:230] = 1
+    cs[250:300,270:500] = 1
+    path = [(100,150),(200,250),(420,250),(500,10)]
+
+
+
 
 
 #=======================================================================
@@ -94,5 +129,5 @@ if selection == 2 and args.path:
 
 
 
-a = BoidModel(0.12, 0.30,  0.05, 0.05,   0.08,  50,  4, 4, numDrones, 20,  cs,path,init,spread)
+a = BoidModel(0.12, 0.30,  0.05, 0.05,   0.02,  20,  4, 4, numDrones, 20,  cs,path,init,spread,tail)
 a.runBoid()
